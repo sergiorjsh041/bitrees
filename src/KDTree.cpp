@@ -189,6 +189,7 @@ uint8_t intersect(vector<bit_vector>* bitvectors, vector<vector<bit_vector>> bit
         c[1] = intersect(bitvectors,bitrees,newposiciones,attr_set,(att+1)%attr_set.size(),p+1,h);
     }
     if (c[0]==0 and c[1]==0) {
+        cout<< "no point"<<endl;
         return 0;
     }
 
