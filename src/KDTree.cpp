@@ -153,8 +153,9 @@ Response KDTree::get_resp(Grid& g) {
 }
 
 uint8_t intersect(vector<bit_vector>* bitvectors, vector<vector<bit_vector>> bitrees,vector<pair<uint8_t,uint8_t>> posiciones, vector<vector<uint64_t>> attr_set,uint64_t att, uint8_t p, uint8_t h) {
-
+    cout<<"p: "<<p<<endl;
     if (p >= h){
+        cout<< "p greater than h"<<endl;
         return 1;
     }
     bit_vector c = bit_vector(2,1);
