@@ -80,9 +80,10 @@ void KDTree::build_tree() {
         }
 
     }
-    for (uint8_t i=0;i<bitvector.size();i++) {
-         cout << bitvector[i] << endl;
-     }
+    cout << bitvector.size() << endl;
+    // for (uint8_t i=0;i<bitvector.size();i++) {
+    //      cout << bitvector[i] << endl;
+    //  }
 
 
     cout << attr_set << endl;
