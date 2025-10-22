@@ -14,9 +14,9 @@ high_resolution_clock::time_point start_select, stop_select;
 double total_time_select = 0.0;       
 duration<double> time_span_select;
 
-#define AT_X 0
-#define AT_Y 1
-#define AT_Z 2
+#define AT_X 2
+#define AT_Y 0
+#define AT_Z 1
 #define AT_V 3
 
 
