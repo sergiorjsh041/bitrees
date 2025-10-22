@@ -8,7 +8,7 @@
 using namespace std::chrono;
 
 
-#include "../src/joins.cpp"
+#include "../src/KDTree.cpp"
 
 high_resolution_clock::time_point start_select, stop_select;
 double total_time_select = 0.0;       
@@ -62,50 +62,55 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
 
 int main(int argc, char** argv)
 {
-    qdag::att_set att_R;
-    qdag::att_set att_S;
-    qdag::att_set att_T;
+    vector<uint64_t> att_R;
+    vector<uint64_t> att_S;
+    vector<uint64_t> att_T;
     
     att_R.push_back(AT_Y); att_R.push_back(AT_X); 
     att_S.push_back(AT_Z); att_S.push_back(AT_X); 
     att_T.push_back(AT_X); att_T.push_back(AT_V);
     
-    std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]); 
+    const std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]);
     
     std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     
-    uint64_t grid_side = 52000000; // es como +infty para wikidata 
+    uint64_t grid_side =67108864; // es como +infty para wikidata
     
     //cout << "R" << endl;
-    qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
+    KDTree qdag_rel_R(*rel_R, grid_side ,2, att_R);
     //cout << "S" << endl;
-    qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
+    KDTree qdag_rel_S(*rel_S, grid_side, 2, att_S);
     //cout << "T" << endl;
-    qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
-
+    KDTree qdag_rel_T(*rel_T, grid_side, 2, att_T);
+    qdag_rel_R.build_tree();
+    qdag_rel_S.build_tree();
+    qdag_rel_T.build_tree();
+    cout<< qdag_rel_R.points.size() << endl;
+    cout<< qdag_rel_S.points.size() << endl;
+    cout<< qdag_rel_T.points.size() << endl;
     // cout << ((((float)qdag_rel_R.size()*8) + ((float)qdag_rel_S.size()*8) + ((float)qdag_rel_T.size()*8) )/(rel_R->size()*2 + rel_S->size()*2 + rel_T->size()*2)) << "\t";
 
 
-    vector<qdag> Q(3);
+    vector<vector<bit_vector>> Q(3);
 
-    Q[0] = qdag_rel_R;
-    Q[1] = qdag_rel_S;
-    Q[2] = qdag_rel_T;
+    Q[0] = qdag_rel_R.bitvector;
+    Q[1] = qdag_rel_S.bitvector;
+    Q[2] = qdag_rel_T.bitvector;
    
-    qdag *Join_Result;
+    vector<bit_vector> Join_Result;
     
  
     high_resolution_clock::time_point start, stop;
     double total_time = 0.0;       
     duration<double> time_span;
    
-    Join_Result = parMultiJoin(Q, true, 1000); // warmup join
+    Join_Result = join(Q, {att_R,att_S,att_T}, 104,4); // warmup join
  
     start = high_resolution_clock::now();    
     
-    Join_Result = parMultiJoin(Q, true, 1000); 
+    Join_Result = join(Q, {att_R,att_S,att_T}, 104,4);
 
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
